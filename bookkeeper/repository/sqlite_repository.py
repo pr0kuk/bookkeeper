@@ -4,9 +4,24 @@
 
 import sqlite3
 from typing import Any
+from datetime import datetime
 from inspect import get_annotations
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
+
+def gettype(attr: Any) -> str:
+    """
+    Узнать типа аттрибута для БД
+    """
+    if isinstance(attr, int) or attr is None:
+        return 'INTEGER'
+    if isinstance(attr, float):
+        return 'REAL'
+    if isinstance(attr, datetime):
+        return 'timestamp'
+    if isinstance(attr, bytes):
+        return 'BLOB'
+    return 'TEXT'
 
 class SQLiteRepository(AbstractRepository[T]):
     """
@@ -23,14 +38,36 @@ class SQLiteRepository(AbstractRepository[T]):
         """
         Конструктор репозитория
         """
-        pass
+        self.db_file = db_file
+        self.table_name = cls.__name__.lower()
+        self.fields = get_annotations(cls, eval_str=True)
+        if 'pk' in self.fields:
+            self.fields.pop('pk')
+        self.cls_ty = cls
+        with sqlite3.connect(self.db_file) as con:
+            query = (f'CREATE TABLE IF NOT EXISTS {self.table_name} 'f'(id INTEGER PRIMARY KEY, name TEXT, value INTEGER, date timestamp, real REAL)')
+            con.cursor().execute(query)
 
     def add(self, obj: T) -> int:
         """
         Добавить объект в репозиторий, вернуть id объекта,
         также записать id в атрибут pk.
         """
-        pass
+        if getattr(obj, 'pk', None) != 0:
+            raise ValueError(f'trying to add object {obj} with filled `pk` attribute')
+        names = ', '.join(self.fields.keys())
+        qmarks = ', '.join("?" * len(self.fields))
+        values = [getattr(obj, x) for x in self.fields]
+        with sqlite3.connect(self.db_file) as con:
+            cur = con.cursor()
+            cur.execute('PRAGMA foreign_keys = ON')
+            cur.execute(
+                f'INSERT INTO {self.table_name} ({names}) VALUES ({qmarks})',
+                values
+            )
+            assert isinstance(cur.lastrowid, int)
+            obj.pk = cur.lastrowid
+        return obj.pk
 
     def get(self, pk: int) -> T | None:
         """ Получить объект по id """
