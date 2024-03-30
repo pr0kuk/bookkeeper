@@ -15,9 +15,8 @@ class BudgetWidget(QWidget):
         table = QTableWidget(3, 2)
         table.setHorizontalHeaderLabels(["Сумма ", "Бюджет "])
         table.setVerticalHeaderLabels(["День ", "Неделя ", "Месяц "])
-        header = table.horizontalHeader()
-        for i in range(3):
-            header.setSectionResizeMode(i, QHeaderView.Stretch if i == 2 else QHeaderView.ResizeToContents)
+        for i in range(2):
+            table.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch if i == 1 else QHeaderView.ResizeToContents)
         table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         set_data(table, [0, 0, 0], 1)
         layout = QVBoxLayout()
