@@ -39,9 +39,10 @@ def gettype(attr: Any) -> str:
 def forcetostring(value: str | int) -> str | int:
     """Sets decoration to string value.
     """
-    if isinstance(value, str):
-        return f'\'{value}\''
+    # if isinstance(value, str):
+    #     return f'\'{value}\''
     return value
+
 
 class SQLiteRepository(AbstractRepository[T]):
     """
@@ -125,6 +126,16 @@ class SQLiteRepository(AbstractRepository[T]):
         """ Обновить данные об объекте. Объект должен содержать поле pk. """
         pass
 
+    def is_pk_in_db(self, cur: Any, pk: int) -> bool:
+        """
+        Узнать есть ли запись в БД
+        """
+        res = cur.execute(f'SELECT * FROM {self.table_name} WHERE id = {pk}').fetchone()
+        return res is not None
+
     def delete(self, pk: int) -> None:
         """ Удалить запись """
-        pass
+        with sqlite3.connect(self.db_file) as con:
+            if not self.is_pk_in_db(con.cursor(), pk):
+                raise KeyError(f'No object with id={pk} in DB.')
+            con.cursor().execute(f'DELETE FROM {self.table_name} WHERE id = {pk}')
