@@ -102,7 +102,12 @@ class SQLiteRepository(AbstractRepository[T]):
 
     def get(self, pk: int) -> T | None:
         """ Получить объект по id """
-        pass
+        with sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as con:
+            result = con.cursor().execute(f'SELECT * FROM {self.table_name} WHERE id = {pk}').fetchone()
+            if result is None:
+                return None
+            obj: T = self.fill_object(result)
+        return obj
 
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
         """
@@ -122,9 +127,9 @@ class SQLiteRepository(AbstractRepository[T]):
             objs = [self.fill_object(result) for result in results]
         return objs
 
-    def update(self, obj: T) -> None:
+    def update(self, obj: Custom) -> None:
         """ Обновить данные об объекте. Объект должен содержать поле pk. """
-        values = (getattr(obj, x) for x in self.fields)
+        values = tuple(getattr(obj, x) for x in self.fields)
         upd_stm = ', '.join([f'{col} = ?' for col in self.fields])
         with sqlite3.connect(self.db_file) as con:
             if not self.is_pk_in_db(con.cursor(), obj.pk):
