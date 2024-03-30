@@ -15,9 +15,8 @@ class ExpenceWidget(QWidget):
         super().__init__()
         table = QTableWidget(RowCount, 4)
         table.setHorizontalHeaderLabels(["Дата ", "Сумма ", "Категория ", "Комментарий"])
-        header = table.horizontalHeader()
         for i in range(4):
-            header.setSectionResizeMode(i, QHeaderView.Stretch if i == 3 else QHeaderView.ResizeToContents)
+            table.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch if i == 3 else QHeaderView.ResizeToContents)
         table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         set_data(table, [])
         layout = QVBoxLayout()
