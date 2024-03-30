@@ -124,7 +124,12 @@ class SQLiteRepository(AbstractRepository[T]):
 
     def update(self, obj: T) -> None:
         """ Обновить данные об объекте. Объект должен содержать поле pk. """
-        pass
+        values = (getattr(obj, x) for x in self.fields)
+        upd_stm = ', '.join([f'{col} = ?' for col in self.fields])
+        with sqlite3.connect(self.db_file) as con:
+            if not self.is_pk_in_db(con.cursor(), obj.pk):
+                raise ValueError(f'No object with id={obj.pk} in DB.')
+            con.cursor().execute(f'UPDATE {self.table_name} SET {upd_stm} WHERE id = {obj.pk}', values)
 
     def is_pk_in_db(self, cur: Any, pk: int) -> bool:
         """
