@@ -37,6 +37,27 @@ class BudgetWidget(QWidget):
         self.update_expenses(expenses)
         self.update_budget(budget)
 
+    def edit_budget_event(self, budget_item: BudgetItem) -> None:
+        value = budget_item.get_value()
+        if value is None:
+            QMessageBox.critical(self, 'Ошибка', 'Используйте только числа.')
+        else:
+            budget_item.get().amount = value
+            self.budget_modifier(budget_item.get())
+        self.update_budget(budget_item.get())
+
+    def update_expenses(self, exps: list[float]) -> None:
+        self.sign.disconnect()
+        for i, expense in enumerate(exps):
+            self.expenses_table.item(i, 0).setText(str(round(expense, 2)))
+        self.sign.connect(self.edit_budget_event)
+
+    def update_budget(self, budget: Budget) -> None:
+        self.sign.disconnect()
+        for i in range(3):
+            self.expenses_table.item(i, 1).update(budget)
+        self.sign.connect(self.edit_budget_event)
+
     def retrieve_expense(self) -> None:
         self.update_expenses(self.exp_getter())
 
