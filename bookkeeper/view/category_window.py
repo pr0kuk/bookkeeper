@@ -3,7 +3,7 @@ Category Window
 """
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel
 
-class EditcategoryWindow(QWidget):
+class EditCategoryWindow(QWidget):
     def __init__(self, parent) -> None:
         super().__init__()
         self.parent = parent
