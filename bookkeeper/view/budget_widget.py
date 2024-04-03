@@ -36,3 +36,15 @@ class BudgetWidget(QWidget):
         budget = self.budget_getter()
         self.update_expenses(expenses)
         self.update_budget(budget)
+
+    def retrieve_expense(self) -> None:
+        self.update_expenses(self.exp_getter())
+
+    def register_budget_getter(self, handler: Callable[[], Budget]) -> None:
+        self.budget_getter = handler
+
+    def register_budget_modifier(self, handler: Callable[[Budget], None]) -> None:
+        self.budget_modifier = handler
+
+    def register_expense_getter(self, handler: Callable[[], list[float]]) -> None:
+        self.expense_getter = handler
