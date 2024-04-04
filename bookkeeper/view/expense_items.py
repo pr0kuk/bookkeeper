@@ -30,6 +30,25 @@ class ExpenseItem(QTableWidgetItem):
 
 
 class ExpenseAmountItem(ExpenseItem):
+    def validate(self) -> bool:
+        try:
+            float(self.text())
+        except ValueError:
+            return False
+        return True
+
+    def restore(self) -> None:
+        self.setText(str(round(self.trow.expense.amount, 2)))
+
+    def update(self) -> None:
+        self.trow.expense.amount = round(float(self.text()), 2)
+
+    def get_err_msg(self) -> str:
+        return 'Нужно ввести действительное число.'
+
+    def should_emit_on_upd(self) -> bool:
+        return True
+
 class ExpenseCategoryItem(ExpenseItem):
     def __init__(self, row: ExpenseRow, exp_view: Any):
         self.category_view = exp_view.category_view
