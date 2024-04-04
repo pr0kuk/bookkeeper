@@ -32,6 +32,7 @@ class CategoryWidget(QWidget):
     def open_window(self):
         self.edit_ctg = EditCtgWindow(self.cat_list)
         self.edit_ctg.show()    def add_category_event(self) -> None:
+    def add_category_event(self) -> None:
         category_items = self.categories_widget.selectedItems()
         if len(category_items) == 0:
             parent_item: Any = self.categories_widget
@@ -64,3 +65,17 @@ class CategoryWidget(QWidget):
         self.delete_category(category_item)
         self.category_deleter(category_item.category)
         self.category_changed.emit()
+    def register_category_adder(self, handler: Callable[[Category], None]) -> None:
+        self.category_adder = handler
+
+    def register_category_modifier(self, handler: Callable[[Category], None]) -> None:
+        self.category_modifier = handler
+
+    def register_category_checker(self, handler: Callable[[str], bool]) -> None:
+        self.category_checker = handler
+
+    def register_category_deleter(self, handler: Callable[[Category], None]) -> None:
+        self.category_deleter = handler
+
+    def register_category_finder(self, handler: Callable[[str], None | int]) -> None:
+        self.category_finder = handler
