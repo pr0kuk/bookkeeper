@@ -27,3 +27,13 @@ class ExpenseItem(QTableWidgetItem):
 
     def should_emit_on_upd(self) -> bool:
         return False
+
+
+class ExpenseAmountItem(ExpenseItem):
+class ExpenseCategoryItem(ExpenseItem):
+    def __init__(self, row: ExpenseRow, exp_view: Any):
+        self.category_view = exp_view.category_view
+        self.retriever = exp_view.category_retriever
+        super().__init__(row)
+class ExpenseDateItem(ExpenseItem):
+    fmt = "%Y-%m-%d %H:%M:%S"
