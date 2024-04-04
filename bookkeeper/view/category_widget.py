@@ -29,9 +29,22 @@ class CategoryWidget(QWidget):
         self.sign = self.categories_widget.itemChanged
         self.sign.connect(self.edit_category_event)
 
-    def open_window(self):
-        self.edit_ctg = EditCtgWindow(self.cat_list)
-        self.edit_ctg.show()    def add_category_event(self) -> None:
+    def set_category_list(self, categories: list[Category]) -> None:
+        table = self.categories_widget
+        uniq_pk: dict[int, CategoryItem] = {}
+        set_once: bool = False
+        for x in categories:
+            pk = x.pk
+            parent = x.parent
+            parent_category: Any = table
+            if parent is not None:
+                parent_category = uniq_pk.get(int(parent))
+            category_item = CategoryItem(parent_category, x)
+            uniq_pk.update({pk: category_item})
+            if not set_once:
+                table.setCurrentItem(category_item)
+                set_once = True
+
     def contextMenuEvent(self, event: Any) -> None:
         self.menu.exec_(event.globalPos())
 
