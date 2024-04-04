@@ -24,6 +24,25 @@ class Table(QTableWidget):
     def close_category_window(self):
         self.parent.edit_category_window.close()
     
+    def update_exp_event(self, exp_item: ExpenseItem) -> None:
+        if not exp_item.validate():
+            self.sign.disconnect()
+            QMessageBox.critical(self, 'Ошибка', exp_item.get_err_msg())
+            exp_item.restore()
+            self.sign.connect(self.update_exp_event)
+            return
+
+        exp_item.update()
+        if isinstance(exp_item, ExpenseAmountItem):
+            self.sign.disconnect()
+            exp_item.restore()
+            self.sign.connect(self.update_exp_event)
+
+        if exp_item.should_emit_on_upd():
+            self.parent.emit_exp_changed()
+
+        self.parent.exp_modifier(exp_item.trow.expense)
+
     def add_expense(self, expense: Expense) -> None:
         row = ExpenseRow(expense)
         category_item = ExpenseCategoryItem(row, self.parent)
@@ -56,5 +75,15 @@ class Table(QTableWidget):
             return
         self.parent.exp_adder(expense)
         self.parent.emit_exp_changed()
+
     def contextMenuEvent(self, event: Any) -> None:
         self.menu.exec_(event.globalPos())
+
+    def update_categories(self) -> None:
+        try:
+            for row in range(self.rowCount()):
+                titem = self.item(row, 2)
+                assert isinstance(titem, ExpenseItem)
+                titem.restore()
+        except ValueError as vallerr:
+            QMessageBox.critical(self, 'Ошибка', f'{vallerr}')
