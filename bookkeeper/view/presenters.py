@@ -73,3 +73,35 @@ class CategoryPresenter:
             self.categories.remove(x)
             self.category_repo.delete(x.pk)
 
+class ExpensePresenter:
+    def __init__(self,  view: ExpenseConcept):
+        self.view = view
+        self.repo = get_rep(Expense)
+        self.category_repo = get_rep(Category)
+        self.expenses = self.repo.get_all()
+        self.view.register_expense_adder(self.add_expense)
+        self.view.register_expense_deleter(self.delete_expense)
+        self.view.register_expense_modifier(self.modify_expense)
+        self.view.register_category_retriever(self.retrieve_category)
+        self.view.set_expense_list(self.expenses)
+
+    def retrieve_category(self, pk: int) -> str | None:
+        category = self.category_repo.get(pk)
+        if category is None:
+            return None
+        return str(category.name)
+
+    def add_expense(self, expense: Expense) -> None:
+        self.repo.add(expense)
+        self.expenses.append(expense)
+
+    def delete_expense(self, expense: Expense) -> None:
+        self.expenses.remove(expense)
+        self.repo.delete(expense.pk)
+
+    def modify_expense(self, expense: Expense) -> None:
+        self.repo.update(expense)
+
+    def get_expenses_from_till(self, start: datetime, end: datetime) -> list[float]:
+        assert start > end
+        return [x.amount for x in self.expenses if x.expense_date < start and x.expense_date > end]
