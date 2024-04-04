@@ -54,5 +54,29 @@ class ExpenseCategoryItem(ExpenseItem):
         self.category_view = exp_view.category_view
         self.retriever = exp_view.category_retriever
         super().__init__(row)
+
+    def validate(self) -> bool:
+        category_name = self.text()
+        return not self.category_view.category_checker(category_name)
+
+    def restore(self) -> None:
+        category = self.retriever(self.trow.expense.category)
+        if category is None:
+            category_item = self.category_view.get_selected_category()
+            if category_item is None or category_item.category.pk == 0:
+                raise ValueError('Категория не установлена')
+            category = category_item.category.name
+            self.trow.expense.category = category_item.category.pk
+        self.setText(category)
+
+    def update(self) -> None:
+        pk = self.category_view.category_finder(self.text())
+        assert pk is not None
+        self.trow.expense.category = pk
+
+    def get_err_msg(self) -> str:
+        return 'Нужно ввести существующую категорию.'
+
+
 class ExpenseDateItem(ExpenseItem):
     fmt = "%Y-%m-%d %H:%M:%S"
