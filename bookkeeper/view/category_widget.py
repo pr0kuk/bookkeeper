@@ -32,6 +32,18 @@ class CategoryWidget(QWidget):
     def open_window(self):
         self.edit_ctg = EditCtgWindow(self.cat_list)
         self.edit_ctg.show()    def add_category_event(self) -> None:
+    def contextMenuEvent(self, event: Any) -> None:
+        self.menu.exec_(event.globalPos())
+
+    def delete_category(self, category_item: CategoryItem, *_: int) -> None:
+        root = self.categories_widget.invisibleRootItem()
+        (category_item.parent() or root).removeChild(category_item)
+
+    def rename_category(self, category_item: CategoryItem, column: int) -> None:
+        category_item.setText(column, category_item.category.name)
+
+    def set_err_category(self, category_item: CategoryItem, column: int) -> None:
+        category_item.setText(column, f'"{category_item.text(column)}"_err ''не будет установлена')
     def add_category_event(self) -> None:
         category_items = self.categories_widget.selectedItems()
         if len(category_items) == 0:
@@ -65,6 +77,10 @@ class CategoryWidget(QWidget):
         self.delete_category(category_item)
         self.category_deleter(category_item.category)
         self.category_changed.emit()
+
+    def get_selected_category(self) -> QTreeWidgetItem:
+        return self.categories_widget.currentItem()
+
     def register_category_adder(self, handler: Callable[[Category], None]) -> None:
         self.category_adder = handler
 
