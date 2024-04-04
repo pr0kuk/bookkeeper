@@ -57,6 +57,27 @@ class CategoryWidget(QWidget):
 
     def set_err_category(self, category_item: CategoryItem, column: int) -> None:
         category_item.setText(column, f'"{category_item.text(column)}"_err ''не будет установлена')
+
+    def edit_category_event(self, category_item: CategoryItem, column: int) -> None:
+        entered_text = category_item.text(column)
+
+        if category_item.category.pk == 0:
+            action: Any = self.category_adder
+            revert: Any = self.set_err_category
+        else:
+            action = self.category_modifier
+            revert = self.rename_category
+
+        if not self.category_checker(entered_text):
+            self.sign.disconnect()
+            revert(category_item, column)
+            self.sign.connect(self.edit_category_event)
+            QMessageBox.critical(self, 'Ошибка', f'Категория {entered_text} уже существует')
+        else:
+            category_item.update(entered_text)
+            action(category_item.category)
+            self.category_changed.emit()
+
     def add_category_event(self) -> None:
         category_items = self.categories_widget.selectedItems()
         if len(category_items) == 0:
