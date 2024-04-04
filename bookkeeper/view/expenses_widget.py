@@ -36,3 +36,20 @@ class ExpenseWidget(QWidget):
         for x in list_to_delete:
             self.expense_deleter(x)
 
+    def update_categories(self) -> None:
+        self.table.update_categories()
+
+    def emit_expense_changed(self) -> None:
+        self.expense_changed.emit()
+
+    def register_category_retriever(self, handler: Callable[[int], None | str]) -> None:
+        self.category_retriever = handler
+
+    def register_expense_adder(self, handler: Callable[[Expense], None]) -> None:
+        self.expense_adder = handler
+
+    def register_expense_deleter(self, handler: Callable[[Expense], None]) -> None:
+        self.expense_deleter = handler
+
+    def register_expense_modifier(self, handler: Callable[[Expense], None]) -> None:
+        self.expense_modifier = handler
