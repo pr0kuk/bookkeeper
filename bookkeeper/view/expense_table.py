@@ -56,3 +56,5 @@ class Table(QTableWidget):
             return
         self.parent.exp_adder(expense)
         self.parent.emit_exp_changed()
+    def contextMenuEvent(self, event: Any) -> None:
+        self.menu.exec_(event.globalPos())
