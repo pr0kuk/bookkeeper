@@ -17,3 +17,10 @@ class Table(QTableWidget):
         self.menu.addAction('Удалить').triggered.connect(self.delete_exp_event)
         self.sign = self.itemChanged
         self.sign.connect(self.update_exp_event)
+
+    def open_category_window(self):
+        self.parent.edit_category_window.show()
+
+    def close_category_window(self):
+        self.parent.edit_category_window.close()
+    
