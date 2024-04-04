@@ -25,4 +25,14 @@ class ExpenseWidget(QWidget):
         self.presenter = ExpensePresenter(self)
         self.edit_category_window = EditCategoryWindow(self)
 
+    def set_expense_list(self, data: list[Expense]) -> None:
+        list_to_delete: list[Expense] = []
+        for x in data:
+            try:
+                self.table.add_expense(x)
+            except ValueError as vallerr:
+                QMessageBox.critical(self, 'Ошибка',f'{vallerr}.\nЗапись 'f'{x.expense_date.strftime("%Y-%m-%d %H:%M:%S")}'' будет удалена.')
+                list_to_delete.append(x)
+        for x in list_to_delete:
+            self.expense_deleter(x)
 
