@@ -31,4 +31,36 @@ class CategoryWidget(QWidget):
 
     def open_window(self):
         self.edit_ctg = EditCtgWindow(self.cat_list)
-        self.edit_ctg.show()
+        self.edit_ctg.show()    def add_category_event(self) -> None:
+        category_items = self.categories_widget.selectedItems()
+        if len(category_items) == 0:
+            parent_item: Any = self.categories_widget
+            parent_pk = None
+        else:
+            assert len(category_items) == 1
+            parent_item = category_items.pop()
+            parent_pk = parent_item.category.pk
+
+        if parent_pk == 0:
+            QMessageBox.critical(self, 'Ошибка', 'Создание подкатегории с ошибкой.')
+            return
+
+        self.sign.disconnect()
+        new_category = CategoryItem(parent_item, Category(parent=parent_pk))
+        self.sign.connect(self.edit_category_event)
+        self.categories_widget.setCurrentItem(new_category)
+        self.categories_widget.edit(self.categories_widget.currentIndex())
+        
+
+    def delete_category_event(self) -> None:
+        category_item = self.categories_widget.currentItem()
+        if category_item is None:
+            return
+        assert isinstance(category_item, CategoryItem)
+        if category_item.category.pk == 0:
+            self.delete_category(category_item)
+            return
+
+        self.delete_category(category_item)
+        self.category_deleter(category_item.category)
+        self.category_changed.emit()
