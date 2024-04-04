@@ -80,3 +80,23 @@ class ExpenseCategoryItem(ExpenseItem):
 
 class ExpenseDateItem(ExpenseItem):
     fmt = "%Y-%m-%d %H:%M:%S"
+    def validate(self) -> bool:
+        date_str = self.text()
+        try:
+            datetime.fromisoformat(date_str)
+        except ValueError:
+            return False
+        return True
+
+    def restore(self) -> None:
+        date = self.trow.expense.expense_date
+        self.setText(date.strftime(self.fmt))
+
+    def get_err_msg(self) -> str:
+        return f'Неверный формат даты.\nИспользуйте {self.fmt}'
+
+    def update(self) -> None:
+        self.trow.expense.expense_date = datetime.fromisoformat(self.text())
+
+    def should_emit_on_upd(self) -> bool:
+        return True
