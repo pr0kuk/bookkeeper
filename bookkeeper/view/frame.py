@@ -3,10 +3,10 @@ Main Window
 """
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QMainWindow, QToolBar
-from .expenses.expenses_widget import ExpenseWidget
-from .budget.budget_widget import BudgetWidget
-from .category.category_widget import CategoryWidget
-from .help_window import ReadmeWindow
+from bookkeeper.view.expenses.expenses_widget import ExpenseWidget
+from bookkeeper.view.budget.budget_widget import BudgetWidget
+from bookkeeper.view.category.category_widget import CategoryWidget
+from bookkeeper.view.help_window import ReadmeWindow
 
 
 class Frame(QMainWindow):
