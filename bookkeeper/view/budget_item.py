@@ -9,6 +9,7 @@ class BudgetItem(QTableWidgetItem):
     """
     Абстрактный класс поля бюджета
     """
+
     def __init__(self, budget: Budget, days: int):
         super().__init__()
         self.factor = days
@@ -25,7 +26,7 @@ class BudgetItem(QTableWidgetItem):
         Получить значение по тексту
         """
         try:
-            return float(self.text())/self.factor
+            return float(self.text()) / self.factor
         except ValueError:
             return None
 
@@ -34,4 +35,4 @@ class BudgetItem(QTableWidgetItem):
         Установить текст по значению
         """
         self.budget = budget
-        self.setText(str(round(self.budget.amount*self.factor, 2)))
+        self.setText(str(round(self.budget.amount * self.factor, 2)))

@@ -12,6 +12,7 @@ class Table(QTableWidget):
     """
     Класс таблицы расходов
     """
+
     def __init__(self, parent: Any):
         super().__init__()
         self.parent = parent

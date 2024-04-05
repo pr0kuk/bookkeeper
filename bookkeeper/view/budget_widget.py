@@ -8,6 +8,7 @@ from bookkeeper.view.presenters import BudgetPresenter
 from bookkeeper.models.budget import Budget
 from .budget_item import BudgetItem
 
+
 class BudgetWidget(QWidget):
     """
     Виджет бюджета

@@ -11,6 +11,7 @@ class ExpenseRow:
     """
     Класс ряда таблицы
     """
+
     def __init__(self, expense: Expense):
         self.expense = expense
 
@@ -19,6 +20,7 @@ class ExpenseItem(QTableWidgetItem):
     """
     Абстрактный класс поля таблицы расходов
     """
+
     def __init__(self, row: ExpenseRow):
         super().__init__()
         self.trow = row
@@ -59,6 +61,7 @@ class ExpenseAmountItem(ExpenseItem):
     """
     Класс поля таблицы расходов для значения
     """
+
     def validate(self) -> bool:
         """
         Проверка корректности значения
@@ -98,6 +101,7 @@ class ExpenseCategoryItem(ExpenseItem):
     """
     Класс поля таблицы расходов для категории
     """
+
     def __init__(self, row: ExpenseRow, expense_view: Any):
         self.category_view = expense_view.category_view
         self.retriever = expense_view.category_retriever

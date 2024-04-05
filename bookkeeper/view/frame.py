@@ -13,6 +13,7 @@ class Frame(QMainWindow):
     """
     Главное окно
     """
+
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Bookkeeper")

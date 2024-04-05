@@ -11,6 +11,7 @@ class ExpenseConcept(Protocol):
     """
     Концепт виджета расходов
     """
+
     def register_expense_adder(self, handler: Callable[[Expense], None]) -> None:
         """
         Установить обработчик добавления расходов
@@ -41,6 +42,7 @@ class CategoryConcept(Protocol):
     """
     Концепт виджета категорий
     """
+
     def set_category_list(self, categories: list[Category]) -> None:
         """
         Установить обработчик инициализации категорий
@@ -83,12 +85,10 @@ class BudgetConcept(Protocol):
         Установить обработчик изменения бюджета
         """
 
-
     def register_bgt_getter(self, handler: Callable[[], Budget]) -> None:
         """
         Установить обработчик получения бюджета
         """
-
 
     def register_expense_getter(self, handler: Callable[[], list[float]]) -> None:
         """

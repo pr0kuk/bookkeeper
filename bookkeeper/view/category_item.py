@@ -11,6 +11,7 @@ class CategoryItem(QTreeWidgetItem):
     """
     Класс элемента дерева категорий
     """
+
     def __init__(self, parent: Any, category: Category):
         super().__init__(parent, [category.name])
         self.setFlags(self.flags() | Qt.ItemIsEditable)
