@@ -168,3 +168,6 @@ data/
 
 # script check
 all_checks.bash
+
+#text instr
+readme.txt
