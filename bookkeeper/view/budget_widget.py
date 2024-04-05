@@ -6,7 +6,7 @@ from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QWidget, QMessageBox
 from bookkeeper.view.presenters import BudgetPresenter
 from bookkeeper.models.budget import Budget
-from .budget_item import BudgetItem
+from bookkeeper.view.budget_item import BudgetItem
 
 
 class BudgetWidget(QWidget):
@@ -24,8 +24,8 @@ class BudgetWidget(QWidget):
         self.expenses_table.setVerticalHeaderLabels(["День ", "Неделя ", "Месяц "])
         for i in range(2):
             self.expenses_table.horizontalHeader().setSectionResizeMode(
-                i, QtWidgets.QHeaderView.Stretch if i == 1 else
-                QtWidgets.QHeaderView.ResizeToContents)
+                i, QtWidgets.QHeaderView.ResizeMode.Stretch if i == 1 else
+                QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         budget = Budget()
         for i, l in zip(range(3), [1, 7, 30]):
             self.expenses_table.setItem(i, 1, BudgetItem(budget, l))
@@ -36,7 +36,7 @@ class BudgetWidget(QWidget):
         self.expense_presenter = expense_presenter
         for i in range(3):
             lost_item = QtWidgets.QTableWidgetItem()
-            lost_item.setFlags(lost_item.flags() & ~QtCore.Qt.ItemIsEditable)
+            lost_item.setFlags(lost_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
             self.expenses_table.setItem(i, 0, lost_item)
         self.sign = self.expenses_table.itemChanged
         self.sign.connect(self.edit_budget_event)

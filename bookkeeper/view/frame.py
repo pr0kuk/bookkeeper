@@ -36,7 +36,7 @@ class Frame(QMainWindow):
         main_widget.setLayout(layout)
         self.setCentralWidget(main_widget)
 
-    def open_help(self):
+    def open_help(self) -> None:
         """
         Открыть окно помощи
         """

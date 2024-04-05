@@ -1,15 +1,18 @@
 """
 Presenters File
 """
+from typing import TypeVar, Any
 from datetime import datetime, timedelta
 from bookkeeper.models.category import Category
 from bookkeeper.models.budget import Budget
 from bookkeeper.models.expense import Expense
 from bookkeeper.repository.sqlite_repository import SQLiteRepository
-from .concepts import CategoryConcept, ExpenseConcept, BudgetConcept
+from .concepts import BudgetWidget, CategoryWidget
+
+T = TypeVar('T', bound=Budget | Category | Expense)
 
 
-def get_rep(model_type: Category | Budget | Expense):
+def get_rep(model_type: type[T]) -> SQLiteRepository[T]:
     """
     Получить sqlite репозиторий для объекта типа type
 
@@ -21,7 +24,7 @@ def get_rep(model_type: Category | Budget | Expense):
     -------
     Объект класса SQLiteRepository
     """
-    return SQLiteRepository[model_type]("data/sqlite.db", model_type)
+    return SQLiteRepository[T]("data/sqlite.db", model_type)
 
 
 class BudgetPresenter:
@@ -29,7 +32,7 @@ class BudgetPresenter:
     Presenter для виджета бюджета
     """
 
-    def __init__(self, view: BudgetConcept):
+    def __init__(self, view: BudgetWidget):
         self.view = view
         self.expense_presenter = self.view.expense_presenter
         self.repo = get_rep(Budget)
@@ -67,7 +70,7 @@ class CategoryPresenter:
     Presenter для виджета категория
     """
 
-    def __init__(self, view: CategoryConcept):
+    def __init__(self, view: CategoryWidget):
         self.view = view
         self.category_repo = get_rep(Category)
         self.categories = self.category_repo.get_all()
@@ -128,7 +131,7 @@ class ExpensePresenter:
     Presenter для виджета расходов
     """
 
-    def __init__(self, view: ExpenseConcept):
+    def __init__(self, view: Any):
         self.view = view
         self.repo = get_rep(Expense)
         self.category_repo = get_rep(Category)

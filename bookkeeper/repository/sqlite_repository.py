@@ -25,12 +25,12 @@ def gettype(attr: Any) -> str:
     return 'TEXT'
 
 
-def convert_datetime(val):
+def convert_datetime(val: Any) -> datetime:
     """Convert ISO 8601 datetime to datetime.datetime object."""
     return datetime.fromisoformat(val.decode())
 
 
-def adapt_datetime(val):
+def adapt_datetime(val: datetime) -> str:
     """Adapt datetime.datetime to timezone-naive ISO 8601 date."""
     return val.isoformat()
 
@@ -71,7 +71,7 @@ class SQLiteRepository(AbstractRepository[T]):
         """
         Создать объект по данным из БД
         """
-        obj = self.cls_ty()
+        obj: T = self.cls_ty()
         obj.pk = result[0]
         for x, res in zip(self.fields, result[1:]):
             setattr(obj, x, res)

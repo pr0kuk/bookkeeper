@@ -14,7 +14,7 @@ class CategoryItem(QTreeWidgetItem):
 
     def __init__(self, parent: Any, category: Category):
         super().__init__(parent, [category.name])
-        self.setFlags(self.flags() | Qt.ItemIsEditable)
+        self.setFlags(self.flags() | Qt.ItemFlag.ItemIsEditable)
         self.category = category
 
     def update(self, name: str) -> None:
