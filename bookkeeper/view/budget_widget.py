@@ -1,10 +1,9 @@
 from typing import Any, Callable
-from .budget_item import BudgetDayItem, BudgetMonthItem, BudgetWeekItem, BudgetItem
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QWidget, QMessageBox
 from bookkeeper.view.presenters import BudgetPresenter
 from bookkeeper.models.budget import Budget
-
+from .budget_item import BudgetItem
 
 class BudgetWidget(QWidget):
     budget_getter: Callable[[], Budget]
@@ -21,8 +20,8 @@ class BudgetWidget(QWidget):
                 i, QtWidgets.QHeaderView.Stretch if i == 1 else
                 QtWidgets.QHeaderView.ResizeToContents)
         budget = Budget()
-        for i, l in zip(range(3), [BudgetDayItem, BudgetWeekItem, BudgetMonthItem]):
-            self.expenses_table.setItem(i, 1, l(budget))
+        for i, l in zip(range(3), [1, 7, 30]):
+            self.expenses_table.setItem(i, 1, BudgetItem(budget, l))
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(QtWidgets.QLabel("Бюджет"))
         layout.addWidget(self.expenses_table)
