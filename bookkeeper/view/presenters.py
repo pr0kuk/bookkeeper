@@ -5,12 +5,13 @@ from bookkeeper.models.expense import Expense
 from .concepts import CategoryConcept, ExpenseConcept, BudgetConcept
 from bookkeeper.repository.sqlite_repository import SQLiteRepository
 
-def get_rep(type : Category | Budget | Expense):
+
+def get_rep(type: Category | Budget | Expense):
     return SQLiteRepository[type]("data/sqlite.db", type)
 
 
 class BudgetPresenter:
-    def __init__(self,  view : BudgetConcept):
+    def __init__(self, view: BudgetConcept):
         self.view = view
         self.expense_presenter = self.view.expense_presenter
         self.repo = get_rep(Budget)
@@ -19,7 +20,8 @@ class BudgetPresenter:
         self.view.register_expense_getter(self.get_expense)
 
     def get_expense(self) -> list[float]:
-        return [sum(self.expense_presenter.get_expenses_from_till(datetime.now(), datetime.now() - timedelta(days=d))) for d in [1, 7, 30]]
+        return [sum(self.expense_presenter.get_expenses_from_till(
+            datetime.now(), datetime.now() - timedelta(days=d))) for d in [1, 7, 30]]
 
     def modify_budget(self, budget: Budget) -> None:
         self.repo.update(budget)
@@ -32,8 +34,9 @@ class BudgetPresenter:
             budgets.append(budget)
         return budgets.pop()
 
+
 class CategoryPresenter:
-    def __init__(self,  view: CategoryConcept):
+    def __init__(self, view: CategoryConcept):
         self.view = view
         self.category_repo = get_rep(Category)
         self.categories = self.category_repo.get_all()
@@ -73,8 +76,9 @@ class CategoryPresenter:
             self.categories.remove(x)
             self.category_repo.delete(x.pk)
 
+
 class ExpensePresenter:
-    def __init__(self,  view: ExpenseConcept):
+    def __init__(self, view: ExpenseConcept):
         self.view = view
         self.repo = get_rep(Expense)
         self.category_repo = get_rep(Category)
@@ -104,4 +108,5 @@ class ExpensePresenter:
 
     def get_expenses_from_till(self, start: datetime, end: datetime) -> list[float]:
         assert start > end
-        return [x.amount for x in self.expenses if x.expense_date < start and x.expense_date > end]
+        return [x.amount for x in self.expenses if x.expense_date <
+                start and x.expense_date > end]

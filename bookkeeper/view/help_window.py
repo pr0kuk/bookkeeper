@@ -3,6 +3,7 @@ Help Window
 """
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit
 
+
 class ReadmeWindow(QWidget):
     def __init__(self) -> None:
         super().__init__()

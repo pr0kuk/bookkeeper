@@ -3,9 +3,11 @@ from typing import Any
 from PySide6.QtWidgets import QTableWidgetItem
 from bookkeeper.models.expense import Expense
 
+
 class ExpenseRow:
     def __init__(self, expense: Expense):
         self.expense = expense
+
 
 class ExpenseItem(QTableWidgetItem):
     def __init__(self, row: ExpenseRow):
@@ -49,6 +51,7 @@ class ExpenseAmountItem(ExpenseItem):
     def should_emit_on_upd(self) -> bool:
         return True
 
+
 class ExpenseCategoryItem(ExpenseItem):
     def __init__(self, row: ExpenseRow, expense_view: Any):
         self.category_view = expense_view.category_view
@@ -80,6 +83,7 @@ class ExpenseCategoryItem(ExpenseItem):
 
 class ExpenseDateItem(ExpenseItem):
     fmt = "%Y-%m-%d %H:%M:%S"
+
     def validate(self) -> bool:
         date_str = self.text()
         try:

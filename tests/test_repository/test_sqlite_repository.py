@@ -3,6 +3,7 @@ from os import remove
 import pytest
 from datetime import datetime
 
+
 class Custom():
     pk: int = 0
     name: str = "TEST"
@@ -15,18 +16,21 @@ class Custom():
 
     def __eq__(self, other) -> bool:
         return self.pk == other.pk and self.name == other.name and self.value == other.value
-    
+
+
 @pytest.fixture
 def custom_class():
     return Custom
+
 
 @pytest.fixture
 def repo():
     try:
         remove("data/sqlite.db")
-    except:
+    except BaseException:
         pass
     return SQLiteRepository("data/sqlite.db", Custom)
+
 
 def test_crud(repo, custom_class):
     obj = custom_class()
@@ -47,24 +51,29 @@ def test_cannot_add_with_pk(repo, custom_class):
     with pytest.raises(ValueError):
         repo.add(obj)
 
+
 def test_cannot_add_without_pk(repo):
     with pytest.raises(ValueError):
         repo.add(0)
 
+
 def test_cannot_delete_unexistent(repo):
     with pytest.raises(KeyError):
         repo.delete(1)
+
 
 def test_cannot_update_without_pk(repo, custom_class):
     obj = custom_class()
     with pytest.raises(ValueError):
         repo.update(obj)
 
+
 def test_get_all(repo, custom_class):
     objects = [custom_class() for i in range(5)]
     for o in objects:
         repo.add(o)
     assert repo.get_all() == objects
+
 
 def test_get_all_with_condition(repo, custom_class):
     objects = []

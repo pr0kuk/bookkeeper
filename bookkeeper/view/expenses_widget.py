@@ -6,6 +6,8 @@ from bookkeeper.view.presenters import ExpensePresenter
 from bookkeeper.models.expense import Expense
 from .expense_table import Table
 from .category_window import EditCategoryWindow
+
+
 class ExpenseWidget(QWidget):
     expense_changed = QtCore.Signal()
     category_retriever: Callable[[int], None | str]
@@ -31,7 +33,9 @@ class ExpenseWidget(QWidget):
             try:
                 self.table.add_expense(x)
             except ValueError as vallerr:
-                QMessageBox.critical(self, 'Ошибка',f'{vallerr}.\nЗапись 'f'{x.expense_date.strftime("%Y-%m-%d %H:%M:%S")}'' будет удалена.')
+                QMessageBox.critical(
+                    self, 'Ошибка', f'{vallerr}.\nЗапись 'f'{
+                        x.expense_date.strftime("%Y-%m-%d %H:%M:%S")}'' будет удалена.')
                 list_to_delete.append(x)
         for x in list_to_delete:
             self.expense_deleter(x)

@@ -5,6 +5,7 @@ from bookkeeper.view.presenters import CategoryPresenter
 from bookkeeper.models.category import Category
 from .category_item import CategoryItem
 
+
 class CategoryWidget(QWidget):
     category_changed = QtCore.Signal()
     category_adder: Callable[[Category], None]
@@ -56,7 +57,9 @@ class CategoryWidget(QWidget):
         category_item.setText(column, category_item.category.name)
 
     def set_err_category(self, category_item: CategoryItem, column: int) -> None:
-        category_item.setText(column, f'"{category_item.text(column)}"_err ''не будет установлена')
+        category_item.setText(
+            column, f'"{
+                category_item.text(column)}"_err ''не будет установлена')
 
     def edit_category_event(self, category_item: CategoryItem, column: int) -> None:
         entered_text = category_item.text(column)
@@ -72,7 +75,8 @@ class CategoryWidget(QWidget):
             self.sign.disconnect()
             revert(category_item, column)
             self.sign.connect(self.edit_category_event)
-            QMessageBox.critical(self, 'Ошибка', f'Категория {entered_text} уже существует')
+            QMessageBox.critical(self, 'Ошибка', f'Категория {
+                                 entered_text} уже существует')
         else:
             category_item.update(entered_text)
             action(category_item.category)
@@ -97,7 +101,7 @@ class CategoryWidget(QWidget):
         self.sign.connect(self.edit_category_event)
         self.categories_widget.setCurrentItem(new_category)
         self.categories_widget.edit(self.categories_widget.currentIndex())
-        
+
     def add_supercategory(self) -> None:
         parent_item: Any = self.categories_widget
         parent_pk = None
@@ -106,7 +110,7 @@ class CategoryWidget(QWidget):
         self.sign.connect(self.edit_category_event)
         self.categories_widget.setCurrentItem(new_category)
         self.categories_widget.edit(self.categories_widget.currentIndex())
-        
+
     def delete_category_event(self) -> None:
         category_item = self.categories_widget.currentItem()
         if category_item is None:

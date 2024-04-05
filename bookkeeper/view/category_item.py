@@ -1,8 +1,8 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTreeWidgetItem
 from typing import Any
-from PySide6.QtWidgets import QTreeWidgetItem
 from bookkeeper.models.category import Category
+
 
 class CategoryItem(QTreeWidgetItem):
     def __init__(self, parent: Any, category: Category):

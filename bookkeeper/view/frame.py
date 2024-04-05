@@ -7,6 +7,8 @@ from .expenses_widget import ExpenseWidget
 from .budget_widget import BudgetWidget
 from .category_widget import CategoryWidget
 from .help_window import ReadmeWindow
+
+
 class Frame(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
@@ -29,6 +31,6 @@ class Frame(QMainWindow):
         main_widget = QWidget()
         main_widget.setLayout(layout)
         self.setCentralWidget(main_widget)
-    
+
     def open_help(self):
         self.help_window.show()

@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QWidget, QMessageBox
 from bookkeeper.view.presenters import BudgetPresenter
 from bookkeeper.models.budget import Budget
 
+
 class BudgetWidget(QWidget):
     budget_getter: Callable[[], Budget]
     budget_modifier: Callable[[Budget], None]
@@ -16,9 +17,11 @@ class BudgetWidget(QWidget):
         self.expenses_table.setHorizontalHeaderLabels(["Сумма ", "Бюджет "])
         self.expenses_table.setVerticalHeaderLabels(["День ", "Неделя ", "Месяц "])
         for i in range(2):
-            self.expenses_table.horizontalHeader().setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch if i == 1 else QtWidgets.QHeaderView.ResizeToContents)
+            self.expenses_table.horizontalHeader().setSectionResizeMode(
+                i, QtWidgets.QHeaderView.Stretch if i == 1 else
+                QtWidgets.QHeaderView.ResizeToContents)
         budget = Budget()
-        for i,l in zip(range(3), [BudgetDayItem, BudgetWeekItem, BudgetMonthItem]):
+        for i, l in zip(range(3), [BudgetDayItem, BudgetWeekItem, BudgetMonthItem]):
             self.expenses_table.setItem(i, 1, l(budget))
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(QtWidgets.QLabel("Бюджет"))

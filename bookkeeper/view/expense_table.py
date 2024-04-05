@@ -1,7 +1,9 @@
-from .expense_items import ExpenseAmountItem, ExpenseCategoryItem, ExpenseItem, ExpenseRow, ExpenseDateItem
+from .expense_items import (ExpenseAmountItem, ExpenseCategoryItem, ExpenseItem,
+                            ExpenseRow, ExpenseDateItem)
 from typing import Any
 from PySide6.QtWidgets import QTableWidget, QMenu, QMessageBox, QHeaderView
 from bookkeeper.models.expense import Expense
+
 
 class Table(QTableWidget):
     def __init__(self, parent: Any):
@@ -11,7 +13,8 @@ class Table(QTableWidget):
         self.setRowCount(0)
         self.setHorizontalHeaderLabels(["Дата ", "Сумма ", "Категория ", "Комментарий"])
         for i in range(4):
-            self.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch if i == 3 else QHeaderView.ResizeToContents)
+            self.horizontalHeader().setSectionResizeMode(
+                i, QHeaderView.Stretch if i == 3 else QHeaderView.ResizeToContents)
         self.menu = QMenu(self)
         self.menu.addAction('Добавить').triggered.connect(self.open_category_window)
         self.menu.addAction('Удалить').triggered.connect(self.delete_expense_event)
@@ -23,7 +26,7 @@ class Table(QTableWidget):
 
     def close_category_window(self):
         self.parent.edit_category_window.close()
-    
+
     def update_expense_event(self, expense_item: ExpenseItem) -> None:
         if not expense_item.validate():
             self.sign.disconnect()
@@ -47,7 +50,7 @@ class Table(QTableWidget):
         row = ExpenseRow(expense)
         category_item = ExpenseCategoryItem(row, self.parent)
         rcount = self.rowCount()
-        self.setRowCount(rcount+1)
+        self.setRowCount(rcount + 1)
         self.sign.disconnect()
         self.setItem(rcount, 0, ExpenseDateItem(row))
         self.setItem(rcount, 1, ExpenseAmountItem(row))
