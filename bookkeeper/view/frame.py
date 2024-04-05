@@ -3,9 +3,9 @@ Main Window
 """
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QMainWindow, QToolBar
-from .expenses_widget import ExpenseWidget
-from .budget_widget import BudgetWidget
-from .category_widget import CategoryWidget
+from .expenses.expenses_widget import ExpenseWidget
+from .budget.budget_widget import BudgetWidget
+from .category.category_widget import CategoryWidget
 from .help_window import ReadmeWindow
 
 
