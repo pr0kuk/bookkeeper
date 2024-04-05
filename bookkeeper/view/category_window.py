@@ -11,11 +11,17 @@ class EditCategoryWindow(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Категории"))
         layout.addWidget(self.parent.category_view)
-        cat_edit_button = QPushButton("Выбрать")
-        cat_edit_button.clicked.connect(self.button_clicked)
-        layout.addWidget(cat_edit_button)
+        ch_button = QPushButton("Выбрать")
+        ch_button.clicked.connect(self.ch_button_clicked)
+        ad_button = QPushButton("Новая категория")
+        ad_button.clicked.connect(self.ad_button_clicked)
+        layout.addWidget(ch_button)
+        layout.addWidget(ad_button)
         self.setLayout(layout)
 
-    def button_clicked(self):
-        self.parent.table.add_exp_event()
+    def ch_button_clicked(self):
+        self.parent.table.add_expense_event()
         self.parent.table.close_category_window()
+
+    def ad_button_clicked(self):
+        self.parent.category_view.add_supercategory()

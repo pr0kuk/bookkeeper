@@ -98,7 +98,15 @@ class CategoryWidget(QWidget):
         self.categories_widget.setCurrentItem(new_category)
         self.categories_widget.edit(self.categories_widget.currentIndex())
         
-
+    def add_supercategory(self) -> None:
+        parent_item: Any = self.categories_widget
+        parent_pk = None
+        self.sign.disconnect()
+        new_category = CategoryItem(parent_item, Category(parent=parent_pk))
+        self.sign.connect(self.edit_category_event)
+        self.categories_widget.setCurrentItem(new_category)
+        self.categories_widget.edit(self.categories_widget.currentIndex())
+        
     def delete_category_event(self) -> None:
         category_item = self.categories_widget.currentItem()
         if category_item is None:
