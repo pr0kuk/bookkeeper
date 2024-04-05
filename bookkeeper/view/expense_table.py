@@ -5,7 +5,7 @@ from typing import Any
 from PySide6.QtWidgets import QTableWidget, QMenu, QMessageBox, QHeaderView
 from bookkeeper.models.expense import Expense
 from .expense_items import (ExpenseAmountItem, ExpenseCategoryItem, ExpenseItem,
-                            ExpenseRow, ExpenseDateItem)
+                            ExpenseDateItem)
 
 
 class Table(QTableWidget):
@@ -60,21 +60,21 @@ class Table(QTableWidget):
         if expense_item.should_emit_on_upd():
             self.parent.emit_expense_changed()
 
-        self.parent.expense_modifier(expense_item.trow.expense)
+        self.parent.expense_modifier(expense_item.expense)
 
     def add_expense(self, expense: Expense) -> None:
         """
         Добавить расход
         """
-        row = ExpenseRow(expense)
-        category_item = ExpenseCategoryItem(row, self.parent)
+
+        category_item = ExpenseCategoryItem(expense, self.parent)
         rcount = self.rowCount()
         self.setRowCount(rcount + 1)
         self.sign.disconnect()
-        self.setItem(rcount, 0, ExpenseDateItem(row))
-        self.setItem(rcount, 1, ExpenseAmountItem(row))
+        self.setItem(rcount, 0, ExpenseDateItem(expense))
+        self.setItem(rcount, 1, ExpenseAmountItem(expense))
         self.setItem(rcount, 2, category_item)
-        self.setItem(rcount, 3, ExpenseItem(row))
+        self.setItem(rcount, 3, ExpenseItem(expense))
         self.sign.connect(self.update_expense_event)
 
     def delete_expense_event(self) -> None:
@@ -87,7 +87,7 @@ class Table(QTableWidget):
         titem = self.item(row, 0)
         self.removeRow(row)
         assert isinstance(titem, ExpenseItem)
-        expense_to_del = titem.trow.expense
+        expense_to_del = titem.expense
         self.parent.expense_deleter(expense_to_del)
         self.parent.emit_expense_changed()
 

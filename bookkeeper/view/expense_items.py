@@ -7,23 +7,14 @@ from PySide6.QtWidgets import QTableWidgetItem
 from bookkeeper.models.expense import Expense
 
 
-class ExpenseRow:
-    """
-    Класс ряда таблицы
-    """
-
-    def __init__(self, expense: Expense):
-        self.expense = expense
-
-
 class ExpenseItem(QTableWidgetItem):
     """
     Абстрактный класс поля таблицы расходов
     """
 
-    def __init__(self, row: ExpenseRow):
+    def __init__(self, expense: Expense):
         super().__init__()
-        self.trow = row
+        self.expense = expense
         self.restore()
 
     def validate(self) -> bool:
@@ -36,13 +27,13 @@ class ExpenseItem(QTableWidgetItem):
         """
         Установка текста по значению
         """
-        self.setText(self.trow.expense.comment)
+        self.setText(self.expense.comment)
 
     def update(self) -> None:
         """
         Установка значения по тексту
         """
-        self.trow.expense.comment = self.text()
+        self.expense.comment = self.text()
 
     def get_err_msg(self) -> str:
         """
@@ -76,13 +67,13 @@ class ExpenseAmountItem(ExpenseItem):
         """
         Установка текста по значению
         """
-        self.setText(str(round(self.trow.expense.amount, 2)))
+        self.setText(str(round(self.expense.amount, 2)))
 
     def update(self) -> None:
         """
         Установка значения по тексту
         """
-        self.trow.expense.amount = round(float(self.text()), 2)
+        self.expense.amount = round(float(self.text()), 2)
 
     def get_err_msg(self) -> str:
         """
@@ -102,10 +93,10 @@ class ExpenseCategoryItem(ExpenseItem):
     Класс поля таблицы расходов для категории
     """
 
-    def __init__(self, row: ExpenseRow, expense_view: Any):
+    def __init__(self, expense: Expense, expense_view: Any):
         self.category_view = expense_view.category_view
         self.retriever = expense_view.category_retriever
-        super().__init__(row)
+        super().__init__(expense)
 
     def validate(self) -> bool:
         """
@@ -118,13 +109,13 @@ class ExpenseCategoryItem(ExpenseItem):
         """
         Установка текста по значению
         """
-        category = self.retriever(self.trow.expense.category)
+        category = self.retriever(self.expense.category)
         if category is None:
             category_item = self.category_view.get_selected_category()
             if category_item is None or category_item.category.pk == 0:
                 raise ValueError('Категория не установлена')
             category = category_item.category.name
-            self.trow.expense.category = category_item.category.pk
+            self.expense.category = category_item.category.pk
         self.setText(category)
 
     def update(self) -> None:
@@ -133,7 +124,7 @@ class ExpenseCategoryItem(ExpenseItem):
         """
         pk = self.category_view.category_finder(self.text())
         assert pk is not None
-        self.trow.expense.category = pk
+        self.expense.category = pk
 
     def get_err_msg(self) -> str:
         """
@@ -163,7 +154,7 @@ class ExpenseDateItem(ExpenseItem):
         """
         Установка текста по значению
         """
-        date = self.trow.expense.expense_date
+        date = self.expense.expense_date
         self.setText(date.strftime(self.fmt))
 
     def get_err_msg(self) -> str:
@@ -176,7 +167,7 @@ class ExpenseDateItem(ExpenseItem):
         """
         Установка значения по тексту
         """
-        self.trow.expense.expense_date = datetime.fromisoformat(self.text())
+        self.expense.expense_date = datetime.fromisoformat(self.text())
 
     def should_emit_on_upd(self) -> bool:
         """
