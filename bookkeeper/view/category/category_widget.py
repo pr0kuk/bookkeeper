@@ -4,7 +4,7 @@
 from typing import Any, Callable
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QWidget, QTreeWidgetItem, QMenu, QMessageBox
-from bookkeeper.view.presenters import CategoryPresenter
+from bookkeeper.presenters.presenters import CategoryPresenter
 from bookkeeper.models.category import Category
 from .category_item import CategoryItem
 
