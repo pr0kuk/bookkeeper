@@ -1,5 +1,5 @@
 from bookkeeper.repository.sqlite_repository import SQLiteRepository
-
+from os import remove
 import pytest
 from datetime import datetime
 
@@ -23,9 +23,11 @@ def custom_class():
 
 @pytest.fixture
 def repo():
-    open('databases/test_database.db', 'w').close()
-    return SQLiteRepository("databases/test_database.db")
-
+    try:
+        remove("data/sqlite.db")
+    except:
+        pass
+    return SQLiteRepository("data/sqlite.db", Custom)
 
 def test_crud(repo, custom_class):
     obj = custom_class()
