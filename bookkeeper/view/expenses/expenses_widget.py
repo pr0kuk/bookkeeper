@@ -4,11 +4,11 @@
 from typing import Callable
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QWidget, QMessageBox
-from bookkeeper.view.category_widget import CategoryWidget
-from bookkeeper.view.presenters import ExpensePresenter
+from bookkeeper.view.category.category_widget import CategoryWidget
+from bookkeeper.presenters.presenters import ExpensePresenter
 from bookkeeper.models.expense import Expense
 from .expense_table import Table
-from .category_window import EditCategoryWindow
+from ..category.category_window import EditCategoryWindow
 
 
 class ExpenseWidget(QWidget):
