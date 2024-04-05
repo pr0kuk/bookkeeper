@@ -10,19 +10,6 @@ from inspect import get_annotations
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
 
-def gettype(attr: Any) -> str:
-    """
-    Узнать типа аттрибута для БД
-    """
-    if isinstance(attr, int) or attr is None:
-        return 'INTEGER'
-    if isinstance(attr, float):
-        return 'REAL'
-    if isinstance(attr, datetime):
-        return 'timestamp'
-    return 'TEXT'
-
-
 def convert_datetime(val: Any) -> datetime:
     """
     Сконвертировать дату формата ISO в объект типа datetime
@@ -55,7 +42,8 @@ class SQLiteRepository(AbstractRepository[T]):
         self.db_file = db_file
         self.table_name = ty.__name__.lower()
         self.fields = get_annotations(ty, eval_str=True)
-        self.fields.pop('pk')
+        if 'pk' in self.fields:
+            self.fields.pop('pk')
         self.cls_ty = ty
         self.table_name = ty.__name__.lower()
         os.makedirs(os.path.dirname(db_file), exist_ok=True)
@@ -63,20 +51,20 @@ class SQLiteRepository(AbstractRepository[T]):
         sqlite3.register_adapter(datetime, adapt_datetime)
         with sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES |
                              sqlite3.PARSE_COLNAMES) as con:
-            values = [(f'{x}', gettype(getattr(ty, x))) for x in self.fields]
-            qstring = ', '.join([f'{x} {typ}' for x, typ in values])
+            vals = [(f'{x}', gettype(getattr(ty, x))) for x in self.fields]
+            qstring = ', '.join([f'{x} {typ}' for x, typ in vals])
             query = (f'CREATE TABLE IF NOT EXISTS {self.table_name} '
                      f'(id INTEGER PRIMARY KEY, {qstring})')
             con.cursor().execute(query)
 
-    def fill_object(self, result: Any) -> T:
+    def fill_object(self, res: Any) -> T:
         """
         Создать объект по данным из БД
         """
         obj: T = self.cls_ty()
-        obj.pk = result[0]
-        for x, res in zip(self.fields, result[1:]):
-            setattr(obj, x, res)
+        obj.pk = res[0]
+        for x, r in zip(self.fields, res[1:]):
+            setattr(obj, x, r)
         return obj
 
     def add(self, obj: T) -> int:
@@ -85,17 +73,17 @@ class SQLiteRepository(AbstractRepository[T]):
         также записать id в атрибут pk.
         """
         if getattr(obj, 'pk', None) != 0:
-            raise ValueError(f'trying to add object {obj} with filled `pk` attribute')
+            raise ValueError(f'попытка добавить в БД {obj} с ненулевым pk')
         names = ', '.join(self.fields.keys())
         qmarks = ', '.join("?" * len(self.fields))
-        values = [getattr(obj, x) for x in self.fields]
+        vals = [getattr(obj, x) for x in self.fields]
         with sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES |
                              sqlite3.PARSE_COLNAMES) as con:
             cur = con.cursor()
             cur.execute(
                 f'INSERT INTO {
                     self.table_name} ({names}) VALUES ({qmarks})',
-                values)
+                vals)
             assert isinstance(cur.lastrowid, int)
             obj.pk = cur.lastrowid
         return obj.pk
@@ -104,11 +92,11 @@ class SQLiteRepository(AbstractRepository[T]):
         """ Получить объект по id """
         with sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES |
                              sqlite3.PARSE_COLNAMES) as con:
-            result = con.cursor().execute(
+            res = con.cursor().execute(
                 f'SELECT * FROM {self.table_name} WHERE id = {pk}').fetchone()
-            if result is None:
+            if res is None:
                 return None
-            obj: T = self.fill_object(result)
+            obj: T = self.fill_object(res)
         return obj
 
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
@@ -126,24 +114,24 @@ class SQLiteRepository(AbstractRepository[T]):
             query += condition.rsplit(' ', 1)[0]
         with sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES |
                              sqlite3.PARSE_COLNAMES) as con:
-            results = con.cursor().execute(query).fetchall()
-            objs = [self.fill_object(result) for result in results]
+            res = con.cursor().execute(query).fetchall()
+            objs = [self.fill_object(r) for r in res]
         return objs
 
     def update(self, obj: Any) -> None:
         """ Обновить данные об объекте. Объект должен содержать поле pk. """
-        values = tuple(getattr(obj, x) for x in self.fields)
-        upd_stm = ', '.join([f'{col} = ?' for col in self.fields])
+        vals = tuple(getattr(obj, x) for x in self.fields)
+        state = ', '.join([f'{col} = ?' for col in self.fields])
         with sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES |
                              sqlite3.PARSE_COLNAMES) as con:
-            if not self.is_pk_in_db(con.cursor(), obj.pk):
-                raise ValueError(f'No object with id={obj.pk} in DB.')
+            if not self.find_obj(con.cursor(), obj.pk):
+                raise ValueError(f'Couldnt find id={obj.pk} in DB.')
             con.cursor().execute(
                 f'UPDATE {
-                    self.table_name} SET {upd_stm} WHERE id = {
-                    obj.pk}', values)
+                    self.table_name} SET {state} WHERE id = {
+                    obj.pk}', vals)
 
-    def is_pk_in_db(self, cur: Any, pk: int) -> bool:
+    def find_obj(self, cur: Any, pk: int) -> bool:
         """
         Узнать есть ли запись в БД
         """
@@ -154,6 +142,19 @@ class SQLiteRepository(AbstractRepository[T]):
         """ Удалить запись """
         with sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES |
                              sqlite3.PARSE_COLNAMES) as con:
-            if not self.is_pk_in_db(con.cursor(), pk):
-                raise KeyError(f'No object with id={pk} in DB.')
+            if not self.find_obj(con.cursor(), pk):
+                raise KeyError(f'Couldnt find id={pk} in DB.')
             con.cursor().execute(f'DELETE FROM {self.table_name} WHERE id = {pk}')
+
+
+def gettype(attr: Any) -> str:
+    """
+    Узнать тип аттрибута для БД
+    """
+    if isinstance(attr, int) or attr is None:
+        return 'INTEGER'
+    if isinstance(attr, float):
+        return 'REAL'
+    if isinstance(attr, datetime):
+        return 'timestamp'
+    return 'TEXT'
