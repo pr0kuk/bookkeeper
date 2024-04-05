@@ -8,9 +8,9 @@ from PySide6 import QtCore, QtWidgets
 from bookkeeper.models.category import Category
 from bookkeeper.models.budget import Budget
 from bookkeeper.models.expense import Expense
-from bookkeeper.view.category_window import EditCategoryWindow
-from bookkeeper.view.expense_table import Table
-from bookkeeper.view.category_item import CategoryItem
+from bookkeeper.view.category.category_window import EditCategoryWindow
+from bookkeeper.view.expenses.expense_table import Table
+from bookkeeper.view.category.category_item import CategoryItem
 
 
 class ExpensePresenter:
