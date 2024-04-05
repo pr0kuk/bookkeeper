@@ -3,12 +3,11 @@
 """
 
 import sqlite3
+import os
 from typing import Any
 from datetime import datetime
-from bookkeeper.repository.abstract_repository import AbstractRepository, T
 from inspect import get_annotations
-from os import makedirs
-import os
+from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
 
 def gettype(attr: Any) -> str:
@@ -57,7 +56,7 @@ class SQLiteRepository(AbstractRepository[T]):
         self.fields.pop('pk')
         self.cls_ty = ty
         self.table_name = ty.__name__.lower()
-        makedirs(os.path.dirname(db_file), exist_ok=True)
+        os.makedirs(os.path.dirname(db_file), exist_ok=True)
         sqlite3.register_converter('timestamp', convert_datetime)
         sqlite3.register_adapter(datetime, adapt_datetime)
         with sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES |

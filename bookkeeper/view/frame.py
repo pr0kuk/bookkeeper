@@ -10,6 +10,9 @@ from .help_window import ReadmeWindow
 
 
 class Frame(QMainWindow):
+    """
+    Главное окно
+    """
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Bookkeeper")
@@ -33,4 +36,7 @@ class Frame(QMainWindow):
         self.setCentralWidget(main_widget)
 
     def open_help(self):
+        """
+        Открыть окно помощи
+        """
         self.help_window.show()
