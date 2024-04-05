@@ -4,9 +4,9 @@
 from typing import Any, Callable
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QWidget, QMessageBox
-from bookkeeper.view.presenters import BudgetPresenter
+from bookkeeper.presenters.presenters import BudgetPresenter
 from bookkeeper.models.budget import Budget
-from bookkeeper.view.budget_item import BudgetItem
+from bookkeeper.view.budget.budget_item import BudgetItem
 
 
 class BudgetWidget(QWidget):
