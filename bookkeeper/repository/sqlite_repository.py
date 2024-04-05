@@ -26,12 +26,16 @@ def gettype(attr: Any) -> str:
 
 
 def convert_datetime(val: Any) -> datetime:
-    """Convert ISO 8601 datetime to datetime.datetime object."""
+    """
+    Сконвертировать дату формата ISO в объект типа datetime
+    """
     return datetime.fromisoformat(val.decode())
 
 
 def adapt_datetime(val: datetime) -> str:
-    """Adapt datetime.datetime to timezone-naive ISO 8601 date."""
+    """
+    Сконвертировать объект типа datetime в строку формата ISO
+    """
     return val.isoformat()
 
 
