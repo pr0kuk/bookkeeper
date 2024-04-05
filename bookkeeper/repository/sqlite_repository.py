@@ -4,7 +4,7 @@
 
 import sqlite3
 from typing import Any
-from datetime import datetime
+from datetime import datetime, date
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 from inspect import get_annotations
 from os import makedirs
@@ -22,6 +22,13 @@ def gettype(attr: Any) -> str:
     if isinstance(attr, bytes):
         return 'BLOB'
     return 'TEXT'
+
+def convert_datetime(val):
+    """Convert ISO 8601 datetime to datetime.datetime object."""
+    return datetime.fromisoformat(val.decode())
+def adapt_datetime(val):
+    """Adapt datetime.datetime to timezone-naive ISO 8601 date."""
+    return val.isoformat()
 
 
 class SQLiteRepository(AbstractRepository[T]):
@@ -46,12 +53,15 @@ class SQLiteRepository(AbstractRepository[T]):
         self.cls_ty = ty
         self.table_name = ty.__name__.lower()
         makedirs(os.path.dirname(db_file), exist_ok=True)
+        sqlite3.register_converter('timestamp', convert_datetime)
+        sqlite3.register_adapter(datetime, adapt_datetime)
         with sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as con:
             values = [(f'{x}', gettype(getattr(ty, x))) for x in self.fields]
             qstring = ', '.join([f'{x} {typ}' for x, typ in values])
             query = (f'CREATE TABLE IF NOT EXISTS {self.table_name} '
                      f'(id INTEGER PRIMARY KEY, {qstring})')
             con.cursor().execute(query)
+
 
     def fill_object(self, result: Any) -> T:
         """
