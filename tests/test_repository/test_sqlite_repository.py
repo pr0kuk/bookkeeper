@@ -3,23 +3,22 @@ from os import remove
 import pytest
 from datetime import datetime
 
+class Custom():
+    pk: int = 0
+    name: str = "TEST"
+    value: int = 24
+    date: datetime = datetime.now()
+    real: float = 2.5
+
+    def __str__(self) -> str:
+        return f'pk={self.pk} name={self.name} value={self.value}'
+
+    def __eq__(self, other) -> bool:
+        return self.pk == other.pk and self.name == other.name and self.value == other.value
+    
 @pytest.fixture
 def custom_class():
-    class Custom():
-        pk: int = 0
-        name: str = "TEST"
-        value: int = 24
-        date: datetime = datetime.now()
-        real: float = 2.5
-
-        def __str__(self) -> str:
-            return f'pk={self.pk} name={self.name} value={self.value}'
-
-        def __eq__(self, other) -> bool:
-            return self.pk == other.pk and self.name == other.name and self.value == other.value
-
     return Custom
-
 
 @pytest.fixture
 def repo():
@@ -48,29 +47,24 @@ def test_cannot_add_with_pk(repo, custom_class):
     with pytest.raises(ValueError):
         repo.add(obj)
 
-
 def test_cannot_add_without_pk(repo):
     with pytest.raises(ValueError):
         repo.add(0)
 
-
 def test_cannot_delete_unexistent(repo):
     with pytest.raises(KeyError):
         repo.delete(1)
-
 
 def test_cannot_update_without_pk(repo, custom_class):
     obj = custom_class()
     with pytest.raises(ValueError):
         repo.update(obj)
 
-
 def test_get_all(repo, custom_class):
     objects = [custom_class() for i in range(5)]
     for o in objects:
         repo.add(o)
     assert repo.get_all() == objects
-
 
 def test_get_all_with_condition(repo, custom_class):
     objects = []
