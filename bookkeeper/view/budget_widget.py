@@ -73,7 +73,9 @@ class BudgetWidget(QWidget):
         """
         self.sign.disconnect()
         for i in range(3):
-            self.expenses_table.item(i, 1).update(budget)
+            it = self.expenses_table.item(i, 1)
+            assert isinstance(it, BudgetItem)
+            it.update(budget)
         self.sign.connect(self.edit_budget_event)
 
     def retrieve_expense(self) -> None:
