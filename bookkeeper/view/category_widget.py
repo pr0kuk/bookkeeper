@@ -1,3 +1,6 @@
+"""
+Виджет категорий
+"""
 from typing import Any, Callable
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QWidget, QTreeWidgetItem, QMenu, QMessageBox
@@ -5,7 +8,11 @@ from bookkeeper.view.presenters import CategoryPresenter
 from bookkeeper.models.category import Category
 from .category_item import CategoryItem
 
+
 class CategoryWidget(QWidget):
+    """
+    Виджет дерева категорий
+    """
     category_changed = QtCore.Signal()
     category_adder: Callable[[Category], None]
     category_modifier: Callable[[Category], None]
@@ -30,6 +37,9 @@ class CategoryWidget(QWidget):
         self.sign.connect(self.edit_category_event)
 
     def set_category_list(self, categories: list[Category]) -> None:
+        """
+        Инициализировать дерево категорий
+        """
         table = self.categories_widget
         uniq_pk: dict[int, CategoryItem] = {}
         set_once: bool = False
@@ -46,19 +56,36 @@ class CategoryWidget(QWidget):
                 set_once = True
 
     def contextMenuEvent(self, event: Any) -> None:
+        """
+        Обработчик контекстного меню
+        """
         self.menu.exec_(event.globalPos())
 
     def delete_category(self, category_item: CategoryItem, *_: int) -> None:
+        """
+        Удалить категорию
+        """
         root = self.categories_widget.invisibleRootItem()
         (category_item.parent() or root).removeChild(category_item)
 
     def rename_category(self, category_item: CategoryItem, column: int) -> None:
+        """
+        Переименовать категорию
+        """
         category_item.setText(column, category_item.category.name)
 
     def set_err_category(self, category_item: CategoryItem, column: int) -> None:
-        category_item.setText(column, f'"{category_item.text(column)}"_err ''не будет установлена')
+        """
+        Установка категорию с уже существующим именем
+        """
+        category_item.setText(
+            column, f'"{
+                category_item.text(column)}"_err')
 
     def edit_category_event(self, category_item: CategoryItem, column: int) -> None:
+        """
+        Обработчик изменения названия категории
+        """
         entered_text = category_item.text(column)
 
         if category_item.category.pk == 0:
@@ -72,13 +99,17 @@ class CategoryWidget(QWidget):
             self.sign.disconnect()
             revert(category_item, column)
             self.sign.connect(self.edit_category_event)
-            QMessageBox.critical(self, 'Ошибка', f'Категория {entered_text} уже существует')
+            QMessageBox.critical(self, 'Ошибка', f'Категория {
+                                 entered_text} уже существует')
         else:
             category_item.update(entered_text)
             action(category_item.category)
             self.category_changed.emit()
 
     def add_category_event(self) -> None:
+        """
+        Обработчик добавления категории
+        """
         category_items = self.categories_widget.selectedItems()
         if len(category_items) == 0:
             parent_item: Any = self.categories_widget
@@ -97,9 +128,23 @@ class CategoryWidget(QWidget):
         self.sign.connect(self.edit_category_event)
         self.categories_widget.setCurrentItem(new_category)
         self.categories_widget.edit(self.categories_widget.currentIndex())
-        
+
+    def add_supercategory(self) -> None:
+        """
+        Добавить категорию без родителя
+        """
+        parent_item: Any = self.categories_widget
+        parent_pk = None
+        self.sign.disconnect()
+        new_category = CategoryItem(parent_item, Category(parent=parent_pk))
+        self.sign.connect(self.edit_category_event)
+        self.categories_widget.setCurrentItem(new_category)
+        self.categories_widget.edit(self.categories_widget.currentIndex())
 
     def delete_category_event(self) -> None:
+        """
+        Обработчик удаления категории
+        """
         category_item = self.categories_widget.currentItem()
         if category_item is None:
             return
@@ -113,19 +158,37 @@ class CategoryWidget(QWidget):
         self.category_changed.emit()
 
     def get_selected_category(self) -> QTreeWidgetItem:
+        """
+        Получить текущий элемент дерева
+        """
         return self.categories_widget.currentItem()
 
     def register_category_adder(self, handler: Callable[[Category], None]) -> None:
+        """
+        Установить обработчик добавления категории
+        """
         self.category_adder = handler
 
     def register_category_modifier(self, handler: Callable[[Category], None]) -> None:
+        """
+        Установить обработчик изменения категории
+        """
         self.category_modifier = handler
 
     def register_category_checker(self, handler: Callable[[str], bool]) -> None:
+        """
+        Установить обработчик проверки категории
+        """
         self.category_checker = handler
 
     def register_category_deleter(self, handler: Callable[[Category], None]) -> None:
+        """
+        Установить обработчик удаления категории
+        """
         self.category_deleter = handler
 
     def register_category_finder(self, handler: Callable[[str], None | int]) -> None:
+        """
+        Установить обработчик поиска категории
+        """
         self.category_finder = handler

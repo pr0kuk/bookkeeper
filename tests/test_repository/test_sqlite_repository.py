@@ -1,30 +1,35 @@
 from bookkeeper.repository.sqlite_repository import SQLiteRepository
-
+from os import remove
 import pytest
 from datetime import datetime
 
+
+class Custom():
+    pk: int = 0
+    name: str = "TEST"
+    value: int = 24
+    date: datetime = datetime.now()
+    real: float = 2.5
+
+    def __str__(self) -> str:
+        return f'pk={self.pk} name={self.name} value={self.value}'
+
+    def __eq__(self, other) -> bool:
+        return self.pk == other.pk and self.name == other.name and self.value == other.value
+
+
 @pytest.fixture
 def custom_class():
-    class Custom():
-        pk: int = 0
-        name: str = "TEST"
-        value: int = 24
-        date: datetime = datetime.now()
-        real: float = 2.5
-
-        def __str__(self) -> str:
-            return f'pk={self.pk} name={self.name} value={self.value}'
-
-        def __eq__(self, other) -> bool:
-            return self.pk == other.pk and self.name == other.name and self.value == other.value
-
     return Custom
 
 
 @pytest.fixture
 def repo():
-    open('databases/test_database.db', 'w').close()
-    return SQLiteRepository("databases/test_database.db")
+    try:
+        remove("data/sqlite.db")
+    except BaseException:
+        pass
+    return SQLiteRepository("data/sqlite.db", Custom)
 
 
 def test_crud(repo, custom_class):

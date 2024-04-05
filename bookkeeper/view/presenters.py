@@ -1,16 +1,38 @@
+"""
+Presenters File
+"""
+from typing import TypeVar, Any
 from datetime import datetime, timedelta
 from bookkeeper.models.category import Category
 from bookkeeper.models.budget import Budget
 from bookkeeper.models.expense import Expense
-from .concepts import CategoryConcept, ExpenseConcept, BudgetConcept
 from bookkeeper.repository.sqlite_repository import SQLiteRepository
+from .concepts import BudgetWidget, CategoryWidget
 
-def get_rep(type : Category | Budget | Expense):
-    return SQLiteRepository[type]("data/sqlite.db", type)
+T = TypeVar('T', bound=Budget | Category | Expense)
+
+
+def get_rep(model_type: type[T]) -> SQLiteRepository[T]:
+    """
+    Получить sqlite репозиторий для объекта типа type
+
+    Parameters
+    ----------
+    type - тип объекта, для которого получить репозиторий
+
+    Returns
+    -------
+    Объект класса SQLiteRepository
+    """
+    return SQLiteRepository[T]("data/sqlite.db", model_type)
 
 
 class BudgetPresenter:
-    def __init__(self,  view : BudgetConcept):
+    """
+    Presenter для виджета бюджета
+    """
+
+    def __init__(self, view: BudgetWidget):
         self.view = view
         self.expense_presenter = self.view.expense_presenter
         self.repo = get_rep(Budget)
@@ -19,12 +41,22 @@ class BudgetPresenter:
         self.view.register_expense_getter(self.get_expense)
 
     def get_expense(self) -> list[float]:
-        return [sum(self.expense_presenter.get_expenses_from_till(datetime.now(), datetime.now() - timedelta(days=d))) for d in [1, 7, 30]]
+        """
+        Получить суммы расходов за 1, 7, 30 дней
+        """
+        return [sum(self.expense_presenter.get_expenses_from_till(
+            datetime.now(), datetime.now() - timedelta(days=d))) for d in [1, 7, 30]]
 
     def modify_budget(self, budget: Budget) -> None:
+        """
+        Изменить бюджет
+        """
         self.repo.update(budget)
 
     def get_budget(self) -> Budget:
+        """
+        Получить объект бюджета
+        """
         budgets = self.repo.get_all()
         if len(budgets) == 0:
             budget = Budget()
@@ -32,8 +64,13 @@ class BudgetPresenter:
             budgets.append(budget)
         return budgets.pop()
 
+
 class CategoryPresenter:
-    def __init__(self,  view: CategoryConcept):
+    """
+    Presenter для виджета категория
+    """
+
+    def __init__(self, view: CategoryWidget):
         self.view = view
         self.category_repo = get_rep(Category)
         self.categories = self.category_repo.get_all()
@@ -45,24 +82,39 @@ class CategoryPresenter:
         self.view.register_category_finder(self.find_category_by_name)
 
     def modify_category(self, category: Category) -> None:
+        """
+        Изменить категорию
+        """
         self.category_repo.update(category)
 
     def check_name(self, name: str) -> bool:
+        """
+        Проверить по имени существует ли категория
+        """
         if name in [category.name for category in self.categories]:
             return False
         return True
 
     def find_category_by_name(self, name: str) -> int | None:
+        """
+        Найти id по имени категории
+        """
         for category in self.categories:
             if category.name == name:
                 return int(category.pk)
         return None
 
     def add_category(self, category: Category) -> None:
+        """
+        Добавить категорию
+        """
         self.category_repo.add(category)
         self.categories.append(category)
 
     def delete_category(self, top_lvl_category: Category) -> None:
+        """
+        Удалить категорию
+        """
         queue = [top_lvl_category]
         to_delete = []
         while len(queue) != 0:
@@ -73,8 +125,13 @@ class CategoryPresenter:
             self.categories.remove(x)
             self.category_repo.delete(x.pk)
 
+
 class ExpensePresenter:
-    def __init__(self,  view: ExpenseConcept):
+    """
+    Presenter для виджета расходов
+    """
+
+    def __init__(self, view: Any):
         self.view = view
         self.repo = get_rep(Expense)
         self.category_repo = get_rep(Category)
@@ -86,22 +143,38 @@ class ExpensePresenter:
         self.view.set_expense_list(self.expenses)
 
     def retrieve_category(self, pk: int) -> str | None:
+        """
+        Получить название категории по id
+        """
         category = self.category_repo.get(pk)
         if category is None:
             return None
         return str(category.name)
 
     def add_expense(self, expense: Expense) -> None:
+        """
+        Добавить расход
+        """
         self.repo.add(expense)
         self.expenses.append(expense)
 
     def delete_expense(self, expense: Expense) -> None:
+        """
+        Удалить расход
+        """
         self.expenses.remove(expense)
         self.repo.delete(expense.pk)
 
     def modify_expense(self, expense: Expense) -> None:
+        """
+        Изменить запись расхода
+        """
         self.repo.update(expense)
 
     def get_expenses_from_till(self, start: datetime, end: datetime) -> list[float]:
+        """
+        Получить список всех расходов в определённый период
+        """
         assert start > end
-        return [x.amount for x in self.expenses if x.expense_date < start and x.expense_date > end]
+        return [x.amount for x in self.expenses if x.expense_date <
+                start and x.expense_date > end]
