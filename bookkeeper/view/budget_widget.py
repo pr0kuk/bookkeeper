@@ -8,7 +8,7 @@ from bookkeeper.models.budget import Budget
 class BudgetWidget(QWidget):
     budget_getter: Callable[[], Budget]
     budget_modifier: Callable[[Budget], None]
-    exp_getter: Callable[[], list[float]]
+    expense_getter: Callable[[], list[float]]
 
     def __init__(self, expense_presenter: Any) -> None:
         super().__init__()
@@ -59,7 +59,7 @@ class BudgetWidget(QWidget):
         self.sign.connect(self.edit_budget_event)
 
     def retrieve_expense(self) -> None:
-        self.update_expenses(self.exp_getter())
+        self.update_expenses(self.expense_getter())
 
     def register_budget_getter(self, handler: Callable[[], Budget]) -> None:
         self.budget_getter = handler

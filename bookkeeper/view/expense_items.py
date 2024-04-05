@@ -50,9 +50,9 @@ class ExpenseAmountItem(ExpenseItem):
         return True
 
 class ExpenseCategoryItem(ExpenseItem):
-    def __init__(self, row: ExpenseRow, exp_view: Any):
-        self.category_view = exp_view.category_view
-        self.retriever = exp_view.category_retriever
+    def __init__(self, row: ExpenseRow, expense_view: Any):
+        self.category_view = expense_view.category_view
+        self.retriever = expense_view.category_retriever
         super().__init__(row)
 
     def validate(self) -> bool:
