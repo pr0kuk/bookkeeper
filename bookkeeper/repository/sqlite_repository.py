@@ -20,8 +20,6 @@ def gettype(attr: Any) -> str:
         return 'REAL'
     if isinstance(attr, datetime):
         return 'timestamp'
-    if isinstance(attr, bytes):
-        return 'BLOB'
     return 'TEXT'
 
 
