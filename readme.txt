@@ -1,5 +1,5 @@
 Запуск графического интерфейса:
-poetry.exe run python bookkeeper/main.py
+poetry run python bookkeeper/main.py
 
 В верхнем тулбаре есть кнопка Help для подробного описания графического интерфейса
 На главном экране два виджета: траты и бюджет
